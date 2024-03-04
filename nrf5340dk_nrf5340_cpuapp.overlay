@@ -1,0 +1,66 @@
+// To get started, press Ctrl+Space (or Option+Esc) to bring up the completion menu and view the available nodes.
+
+// You can also use the buttons in the sidebar to perform actions on nodes.
+// Actions currently available include:
+
+// * Enabling / disabling the node
+// * Adding the bus to a bus
+// * Removing the node
+// * Connecting ADC channels
+
+// For more help, browse the DeviceTree documentation at https://docs.zephyrproject.org/latest/guides/dts/index.html
+// You can also visit the nRF DeviceTree extension documentation at https://nrfconnect.github.io/vscode-nrf-connect/devicetree/nrfdevicetree.html
+
+///////////////////////// default SPI configuration for SSD1306 OLED //////////////////////////
+// arduino_spi: &spi4 {
+// 	compatible = "nordic,nrf-spim";
+// 	status = "okay";
+// };
+
+///////////////////////// SPI configuration for SSD1306 OLED //////////////////////////
+
+/ {
+	chosen {
+		zephyr,display = &ssd1306_ssd1306_128x64_spi;
+	};
+};
+
+&pinctrl {
+    spi4_default: spi4_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 1, 15)>,
+				<NRF_PSEL(SPIM_MOSI, 1, 13)>;
+		};
+	};
+
+	spi4_sleep: spi4_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 1, 15)>,
+				<NRF_PSEL(SPIM_MOSI, 1, 13)>;
+			low-power-enable;
+		};
+	};
+
+};
+
+&arduino_spi {
+    compatible = "nordic,nrf-spim";
+	status = "okay";
+
+	ssd1306_ssd1306_128x64_spi: ssd1306@0 {
+		compatible = "solomon,ssd1306fb";
+		reg = <0x0>;
+		spi-max-frequency = <10000000>;
+		width = <128>;
+		height = <64>;
+		segment-offset = <0>;
+		page-offset = <0>;
+		display-offset = <0>;
+		multiplex-ratio = <63>;
+		segment-remap;
+		com-invdir;
+		prechargep = <0x22>;
+		data_cmd-gpios = <&arduino_header 15 0>; // D9
+		reset-gpios = <&arduino_header 14 GPIO_ACTIVE_LOW>; // D8
+	};
+};
